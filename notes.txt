@@ -1,0 +1,256 @@
+
+* Ex 2
+
+
+** Heap: Tree
+
+
+swapRacineDernier:
+- Si svalue(fg) <= svalue(fd) => swapRacineDernier(fg) 
+- Sinon => swapRacineDernier(fd)
+
+
+Node = Value Pere FG FD SValue
+
+
+Primitives:
+> Value()
+> Pere()
+> FG()
+> FD()
+> SValue()
+
+> DernierElement()
+
+
+
+
+:Merge(heap1, heap2)
+Si EstVide(heap2) Alors => heap1
+Si EstVide(heap1) Alors => heap2
+Si Racine(heap1) > Racine(heap2) Alors => Merge(heap2, heap1)
+Sinon => 
+ lrank = Rank(FG(heap1)
+ merged = Merge(FD(heap1), heap2)
+ rrank = Rank(merged)
+ Si lrank < rrank Alors => Heap(Racine(heap1), merged, FG(heap1), lrank+1)
+ Sinon => Heap(Racine(heap1), FG(heap1), merged, rrank+1)
+
+
+:Inserer(heap, elem) => Merge(heap, Heap(elem, HeapVide, HeapVide, 1)
+
+
+:SupprMin(heap) => Merge(FG(heap), FD(heap))
+
+:ConsIterAux(heap, li)
+ Si EstVide(li) => heap
+ Sinon ConsIterAux(Inserer(heap, Head(li)), Tail(li))
+
+:ConsIter(li) => ConsIterAux(HeapVide(), li)
+ 
+
+
+** Heap: Array
+
+
+FG: 2*i + 1
+FD: 2*i + 2
+
+
+:ShiftDown(heap, i)
+Si EstVide(heap, i) Alors => HeapVide
+Si EstVide(heap, 2*i+1) et EstVide(heap, 2*i+2) Alors => heap
+Si EstVide(heap, 2*i + 2)
+  Si heap[2*i + 1] < heap[i] Alors 
+    swap(heap[i], heap[2*i+1])
+    ShiftDown(heap, 2*i + 1)
+Si EstVide(heap, 2*i+2) Alors
+  Si heap[2*i + 2] < heap[i] Alors 
+    swap(heap[i], heap[2*i+2])
+    ShiftDown(heap, 2*i + 2)
+Sinon
+  min = 2*i + 2
+  Si heap[2*i+1] < heap[2*i+2] Alors
+    min = 2*i+1
+  Si heap[min] < heap[i] Alors
+    swap(heap[i], heap[min])
+    ShiftDown(heap, heap[min])
+
+
+:SupprMin(heap)
+heap[0] <- heap[heap.taille - 1]
+heap.taille <- heap.taille - 1;
+ShiftDown(heap, 0)
+
+
+
+:ShiftUp(heap, i)
+  parent = (i-1)/2
+  Si heap[parent] > heap[i] Alors
+    swap(heap[parent], heap[i])
+    ShiftUp(heap, parent)
+
+:Inserer(heap, elem)
+  heap[heap.taille] = elem
+  ShiftUp(heap, taille+1)
+  heap.taille++
+
+
+:Heapify(array)
+  start = (array.taille-1)/2
+  for (; start > 0; start--)
+    ShiftDown(array, start)
+       
+
+:Union(heap1, heap2)
+  newSize = heap1.taille + heap2.taille
+  for (int i = heap2.taille; i < heap2.newSize; i++)
+    heap1[i] = heap2[i - heap2.taille]
+  heap2.taille = newSize
+  Heapify(heap1)
+
+:ConsIter(heap1, li)
+  tab <- ToArray(li)
+  Heapify(tab)
+
+
+* Ex 3
+
+** Tournoi binomiaux
+
+data TBinomial a = TEmpty | Node a Int [TBinomial a]
+
+
+EstVide :: TBinomial a -> Bool
+EstVide TEmpty = True
+EstVide _ = False
+
+Degre :: TBinomial a -> Int
+Degre TEmpty = 0
+Degre (Node _ deg li) = deg
+
+
+-- ShiftDownAux :: TBinomial -> [TBinomial] -> TBinomial
+-- ShiftDownAux tree [] = tree
+-- ShiftDownAux (Node val deg (Node cval (deg-1) li2):li) =
+--   if val < cval = 
+
+
+
+-- ShiftDown :: TBinomial -> TBinomial
+-- ShiftDown Empty = Empty
+-- ShiftDown (Node val 1 li) = (Node val 1 li)
+-- ShiftDown (Node val1 deg1 li) = ShiftDownAux  (Node val1 deg1 li) 
+
+
+
+Union2Tid :: TBinomial a -> TBinomial a -> TBinomial
+Union2Tid (Node val1 deg1 li1) (Node val2 deg1 li2) = 
+  if val1 < val2 = (Node val1 deg1+1 (Node val2 deg1 li2):li1) 
+  otherwise = (Node val2 deg1+1 (Node val1 deg1 li1):li2) 
+Union2Tid TEmpty tree = tree
+Union2Tid tree TEmpty = tree
+
+Decapiter :: TBinomial -> FBinomiale
+Decapiter TEmpty -> FEmpty
+Decapiter (Node _ _ children) = children
+
+
+
+** File binomiales
+
+data FBinomiale a = [TBinomial a]
+
+
+-- Operations primitives
+
+
+File :: TBinomial a -> FBinomiale a
+File tree = [tree]
+
+
+EstVide :: FBinomiale a -> Bool
+EstVide [] = True
+EstVide _ = False
+
+ 
+
+MinDeg :: FBinomiale a -> TBinomial a
+MinDeg tb : _ = tb
+
+F = <B5, B4, B2, B1, B0>
+==> B0
+
+
+Reste :: FBinomiale a -> FBinomiale a
+Reste _ : li = li
+
+
+AjoutMin :: FBinomiale a -> TBinomial a -> TBinomial a
+AjoutMin li Empty = li
+AjoutMin li tb = tb:li
+
+-- Methodes
+
+
+UFret :: FBinomiale a -> FBinomiale a -> TBinomial a -> FBinomiale a
+UFret [] fb2 [] = fb2
+UFret [] fb2 t = UFret fb2 File(t) []
+UFret fb1 [] [] = fb1
+UFret fb1 [] t = UFret fb1 File(t) [] 
+UFret fb1 fb2 [] = 
+| Degre(t1) < Degre(t2) = AjoutMin(t1, Union(Reste(fb1), fb2))
+| Degre(t1) > Degre(t2) = AjoutMin(t2, Union(Reste(fb2), fb1))
+| otherwise = UFret(Reste(fb1), Reste(fb2), Union2Tid(t1, t2))
+where (t1, t2) = (MinDeg(fb1) MinDeg(fb2))
+UFret fb1 fb2 t = 
+| Degre(t) < Degre(t1) and Degre(t) < Degre(t2) = AjoutMin(t, Union(fb1, fb2))
+| Degre(t) == Degre(t1) and Degre(t) == Degre(t2) = AjoutMin(t, UFret(Reste(fb1), Reste(fb2) Union2Tid(t1, t2)))
+| Degre(t) == Degre(t1) and Degre(t) < Degre(t2) = UFret(Reste(fb1), fb2, Union2Tid(t1, t))
+| Degre(t) == Degre(t2) and Degre(t) < Degre(t1) = UFret(Reste(fb2), fb1, Union2Tid(t2, t))
+where (t1, t2) = (MinDeg(fb1) MinDeg(fb2))
+
+
+Union :: FBinomiale a -> FBinomiale a -> FBinomiale a
+Union fb1 fb2 = UFret fb1 fb2 []
+
+
+AjoutTB :: FBinomiale a -> TBinomial a -> FBinomiale a
+AjoutTB fb tb = Union fb [tb]
+
+
+AjoutElem :: FBinomiale a -> a -> FBinomiale 
+AjoutElem fb elem = Ajout fb (Node elem 0 [])
+
+
+ConsIterAux :: [a] -> FBinomiale -> FBinomiale
+ConsIterAux [] fb = fb
+ConsIterAux e:li fb = ConsIterAux li (AjoutElem fb e)
+
+ConsIter :: [a] -> FBinomiale a
+ConsIter li = ConsIterAux li FEmpty
+
+
+
+
+FindMin :: FBinomiale -> TBinomial -> TBinomial
+FindMin FEmpty tb = tb
+FindMin (tb1@(Node val1 _ _):tail) tb2@(Node val2 _ _)
+| val1 < val2 = FindMin tail tb1
+| otherwise FindMin tail tb2
+
+SupprTB :: FBinomiale -> TBinomial -> FBinomiale
+SupprTB FEmpty tb = FEmpty
+SupprTB (tb1@(Node _ deg1 _):tail) tb2@(Node _ deg2 _) 
+| deg1 == deg2 = tail
+| otherwise tb1:(SupprTB tail tb2)
+
+SupprMin :: FBinomiale -> FBinomiale 
+SupprMin FEmpty = FEmpty
+SupprMin head:tail = Union(SupprTB (tbmin), Decapiter(tbmin))
+where tbmin = FindMin(tail, head)
+
+
+
+
+
