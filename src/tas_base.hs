@@ -25,7 +25,7 @@ supprLast :: BinaryTree a -> (BinaryTree a, a)
 supprLast (Node val _ Empty Empty) = (Empty, val)
 supprLast (Node val i (Node lval Empty Empty) Empty) = ((Node val (i-1) Empty Empty), lval)
 supprLast (Node val i (Node lval lh llc lrc) (Node rval rh rlc rrc))
-| lh == rh = (Node val (i-1)  
+| lh == rh = (Node val (i-1))
 | otherwise = (Node val i)
 
               
