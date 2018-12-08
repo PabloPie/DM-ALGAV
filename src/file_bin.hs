@@ -10,6 +10,9 @@ degre TEmpty = 0
 degre (Node _ deg li) = deg
 
 
+racine :: TBinomial a -> a
+racine (Node val _ _) = val
+
 
 union2Tid :: (Ord a) => TBinomial a -> TBinomial a -> TBinomial a
 union2Tid (Node val1 deg1 li1) (Node val2 deg2 li2)
@@ -103,11 +106,15 @@ consIter li = consIterAux li []
 
 
 
-findMin :: (Ord a) => FBinomiale a -> TBinomial a -> TBinomial a
-findMin [] tb = tb
-findMin (tb1@(Node val1 _ _):tail) (tb2@(Node val2 _ _))
-  | val1 < val2 = findMin tail tb1
-  | otherwise = (findMin tail tb2)
+findMinAux :: (Ord a) => FBinomiale a -> TBinomial a -> TBinomial a
+findMinAux [] tb = tb
+findMinAux (tb1@(Node val1 _ _):tail) (tb2@(Node val2 _ _))
+  | val1 < val2 = findMinAux tail tb1
+  | otherwise = (findMinAux tail tb2)
+
+findMin :: (Ord a) => FBinomiale a -> TBinomial a
+findMin (head:tail) = (findMinAux tail head)
+
 
 supprTB :: FBinomiale a -> TBinomial a -> FBinomiale a
 supprTB [] tb = []
@@ -118,7 +125,7 @@ supprTB (tb1@(Node _ deg1 _):tail) (tb2@(Node _ deg2 _))
 supprMin :: (Ord a) => FBinomiale a -> FBinomiale a
 supprMin [] = []
 supprMin (head:tail) = (union (supprTB (head:tail) tbmin) (decapiter tbmin))
-  where tbmin = (findMin tail head)
+  where tbmin = (findMinAux tail head)
 
 
 

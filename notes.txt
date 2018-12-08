@@ -254,3 +254,42 @@ where tbmin = FindMin(tail, head)
 
 
 
+
+
+
+* Ex 5
+
+** ABR
+
+type ABR a = ABREmpty | ABRNode a (ABR a) (ABR a)
+
+
+insertABR :: (Ord a) => ABR a -> a -> ABR a
+insertABR ABREmpty e = (ABRNode e ABREmpty ABREmpty)
+insertABR (Node val lchild rchild) 
+| val < e = ABRNode lchild (insertABR rchild e)
+| otherwise = ABRNode (insertABR lchild e) rchild
+
+
+containsABR :: (Ord a) => ABR a -> a -> Bool
+containsABR ABREmpty e = False
+containsABR (Node val lchild rchild)
+| val == e = True
+| val < e = containsABR rchild e
+| otherwise = containsABR lchild e
+
+
+-- Insere tous les elements d'une liste dans un ABR
+insertAll :: (Ord a) => [a] -> ABR a -> ABR a
+insertAll [] abr = abr
+insertAll (head:tail) abr = (insertAll tail (insertABR abr head))
+
+
+-- Construit un ABR a partir d'une liste d'elements
+consABR :: (Ord a) => [a] -> ABR a
+consABR [] = ABREmpty
+consABR li = insertAll li ABREmpty
+
+
+
+
