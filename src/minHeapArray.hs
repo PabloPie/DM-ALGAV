@@ -12,26 +12,25 @@ printAll vec = do
         print x
         printAll (M.tail vec)
 
-add :: (Ord e) => (M.IOVector e) -> e -> IO(M.IOVector e)
+add :: (Ord e) => (M.IOVector e) -> e -> IO()
 add vec ele = do
     M.grow vec 1
     M.write vec (M.length vec -1) ele
     siftUp vec $ M.length vec -1
 
-siftUp :: (Ord e) => (M.IOVector e) -> Int -> IO(M.IOVector e)
-siftUp vec i = do
+siftUp :: (Ord e) => (M.IOVector e) -> Int -> IO()
+siftUp vec i = do 
     if i == 0 then
-        return vec
+        return ()
     else do
         let parentIndex = div (i-1) 2
         parent <- M.read vec parentIndex
         node <- M.read vec i
         if node < parent then do
             M.swap vec i parentIndex
-            v <- siftUp vec parentIndex
-            return v
+            siftUp vec parentIndex
         else
-            return vec
+            return ()
 
 
 -- be careful with taking the modified input instead of the output
@@ -39,8 +38,8 @@ supprMin :: (Ord e) => (M.IOVector e) -> IO(M.IOVector e)
 supprMin vec = do
     M.swap vec 0 $ M.length vec -1
     let a = M.init vec
-    v <- siftDown a 0
-    return v
+    siftDown a 0
+    return a
 
 -- Index -> vector size
 isLeaf :: Int -> Int -> Bool
@@ -64,10 +63,10 @@ minIndex vec lc rc = do
         return lc
 
 -- Sift down the value in index i until a leaf is reached
-siftDown :: (Ord e) => (M.IOVector e) -> Int -> IO(M.IOVector e)
+siftDown :: (Ord e) => (M.IOVector e) -> Int -> IO()
 siftDown vec i = do
     if isLeaf i $ M.length vec then
-        return vec
+        return ()
     else do
         min <- minIndex vec (2*i+1) (2*i+2)
         parent <- M.read vec i
@@ -76,7 +75,7 @@ siftDown vec i = do
             M.swap vec i min
             siftDown vec min
         else
-            return vec      
+            return ()
 
 -- Get the value of the left Child
 leftChild :: (M.IOVector e) -> Int -> IO(e)
@@ -89,31 +88,31 @@ rightChild vec i = do
     M.read vec $ 2*i + 2
 
 -- heapify subtree starting at index i
-heapify :: (Ord e) => (M.IOVector e) -> Int -> IO(M.IOVector e)
+heapify :: (Ord e) => (M.IOVector e) -> Int -> IO()
 heapify vec i = do
     if isLeaf i $ M.length vec then
-        return vec
+        return ()
     else do
-        a <- heapify vec (i+1)
-        v <- siftDown a i
-        return v
+        heapify vec (i+1)
+        siftDown vec i
 
 constIter :: (Ord e) => [e] -> IO(M.IOVector e)
 constIter li = do
     -- fromList O(n)
     -- unsafeThaw O(1)
     z <- V.unsafeThaw $ V.fromList li
-    vec <- heapify z 0
-    return vec
+    heapify z 0
+    return z
 
 
 main = do
     -- v <- M.new 10
-    x <- constIter [11,10,9,8,7,6,5,4,3,2,0]
-    printAll x
-    add x 1
-    putStrLn("---")
-    printAll x
+    x <- constIter [10000,9999..0]
+    return ()
+    -- printAll x
+    -- add x 0
+    -- putStrLn("---")
+    -- printAll x
 
     -- putStrLn("--------------")
     -- newv <- supprMin v
