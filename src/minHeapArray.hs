@@ -1,9 +1,11 @@
-import Control.Monad
-import Control.Monad.ST
+module MinHeapArray where
+
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as M
 
-printAll :: (Show e) => M.IOVector e -> IO()
+type MinHeap = M.IOVector
+
+printAll :: (Show e) => MinHeap e -> IO()
 printAll vec = do
     if(M.null vec) then
         return ()
@@ -12,13 +14,32 @@ printAll vec = do
         print x
         printAll (M.tail vec)
 
-add :: (Ord e) => (M.IOVector e) -> e -> IO()
+-- Create minHeap from 2 minHeaps, vectors are not destroyed in the process
+union :: (Ord e) => MinHeap e -> MinHeap e -> IO(MinHeap e)
+union vec1 vec2 = do
+    -- O(n)
+    z <- V.freeze vec1
+    -- O(n)
+    zz <- V.freeze vec2
+    -- O(n+m)
+    let v = z V.++ zz
+    -- O(n+m)
+    new <- constIter $ V.toList v
+    return new
+    -- M.grow vec1 $ M.length vec2
+    -- cpy vec1 vec2 $ M.length vec2
+    -- return vec1
+
+-- Add element to vector
+add :: (Ord e) => (MinHeap e) -> e -> IO()
 add vec ele = do
     M.grow vec 1
     M.write vec (M.length vec -1) ele
     siftUp vec $ M.length vec -1
 
-siftUp :: (Ord e) => (M.IOVector e) -> Int -> IO()
+
+-- sift the value until the parent is lower or we reach the root
+siftUp :: (Ord e) => (MinHeap e) -> Int -> IO()
 siftUp vec i = do 
     if i == 0 then
         return ()
@@ -34,7 +55,7 @@ siftUp vec i = do
 
 
 -- be careful with taking the modified input instead of the output
-supprMin :: (Ord e) => (M.IOVector e) -> IO(M.IOVector e)
+supprMin :: (Ord e) => (MinHeap e) -> IO(MinHeap e)
 supprMin vec = do
     M.swap vec 0 $ M.length vec -1
     let a = M.init vec
@@ -49,7 +70,7 @@ isLeaf i n
     | otherwise = False
 
 -- get the index that contains de minimal value
-minIndex :: (Ord e) => M.IOVector e -> Int -> Int -> IO(Int)
+minIndex :: (Ord e) => (MinHeap e) -> Int -> Int -> IO(Int)
 minIndex vec lc rc = do
     -- read only if rc < M.length -1
     if rc < M.length vec then do
@@ -63,7 +84,7 @@ minIndex vec lc rc = do
         return lc
 
 -- Sift down the value in index i until a leaf is reached
-siftDown :: (Ord e) => (M.IOVector e) -> Int -> IO()
+siftDown :: (Ord e) => (MinHeap e) -> Int -> IO()
 siftDown vec i = do
     if isLeaf i $ M.length vec then
         return ()
@@ -78,17 +99,17 @@ siftDown vec i = do
             return ()
 
 -- Get the value of the left Child
-leftChild :: (M.IOVector e) -> Int -> IO(e)
+leftChild :: (MinHeap e) -> Int -> IO(e)
 leftChild vec i = do
     M.read vec $ 2*i + 1
 
 -- Get the value of the right Child
-rightChild :: (M.IOVector e) -> Int -> IO(e)
+rightChild :: (MinHeap e) -> Int -> IO(e)
 rightChild vec i = do
     M.read vec $ 2*i + 2
 
 -- heapify subtree starting at index i
-heapify :: (Ord e) => (M.IOVector e) -> Int -> IO()
+heapify :: (Ord e) => (MinHeap e) -> Int -> IO()
 heapify vec i = do
     if isLeaf i $ M.length vec then
         return ()
@@ -96,7 +117,8 @@ heapify vec i = do
         heapify vec (i+1)
         siftDown vec i
 
-constIter :: (Ord e) => [e] -> IO(M.IOVector e)
+-- create a vector from a list, make it mutable and heapify it
+constIter :: (Ord e) => [e] -> IO(MinHeap e)
 constIter li = do
     -- fromList O(n)
     -- unsafeThaw O(1)
@@ -104,48 +126,12 @@ constIter li = do
     heapify z 0
     return z
 
-
-main = do
-    -- v <- M.new 10
-    x <- constIter [10000,9999..0]
-    return ()
-    -- printAll x
-    -- add x 0
-    -- putStrLn("---")
-    -- printAll x
-
-    -- putStrLn("--------------")
-    -- newv <- supprMin v
-    -- printAll newv
-
-    -- M.write v 0 (3 :: Int)
-    -- M.write v 1 5
-    -- M.write v 2 8
-    -- a <- leftChild v 0
-    -- b <- rightChild v 0
-    -- a <- M.read v 0
-    -- b <- M.read v 1
-    -- print a
-    -- print b
-
-    -- print (a<b)
-    -- print $ 2 <  M.length v
-    
-    -- test v
-
-    -- let len = M.length v
-    -- x <- M.read v 0
-    -- print x
-    -- print len
-
-    -- let a = M.tail v
-    -- x <- M.read a 0
-    -- print x
-    -- print $ M.length a
-    -- test a
-    -- x <- M.read a 0
-    -- print x
-
-    -- let b = M.drop 9 a
-    -- print $ M.length b
-    -- print $ M.null b
+-- cpy :: M.IOVector e -> M.IOVector e -> Int -> IO()
+-- cpy vec1 vec2 i = do
+--     if M.null vec2 then
+--         return ()
+--     else do
+--         x <- M.read vec2 0
+--         M.write vec1 i x
+--         let vecaux = M.tail vec2
+--         cpy vec1 vecaux (i+1)
