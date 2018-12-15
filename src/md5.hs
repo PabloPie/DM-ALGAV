@@ -66,7 +66,7 @@ md5Iter :: Word32 -> Word32 -> Word32 -> Word32 -> Word32 -> Chunk512 -> (Word32
 md5Iter 64 a b c d m = (a0 + a, b0 + b, c0 + c, d0 + d)
 md5Iter i a b c d m = md5Iter (i+1) d c b (b + (rotate (f + a + (lookupTableSin!idx) + (m!gdx) + (shiftTable!idx2)) fshift)) m
   where (f, g) = (calcFG i b c d)
-        (idx, idx2, gdx, fshift) = ((word32toInteger i), (word32toInt i), (word32toInt f), (word32toInt g))
+        (idx, idx2, gdx, fshift) = ((word32toInteger i), (word32toInt i), (word32toInt g), (word32toInt f))
 
   
 type Chunk512 = Array Int Word32
