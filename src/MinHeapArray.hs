@@ -24,7 +24,7 @@ union vec1 vec2 = do
     -- O(n+m)
     let v = z V.++ zz
     -- O(n+m)
-    new <- constIter $ V.toList v
+    new <- consIter $ V.toList v
     return new
     -- M.grow vec1 $ M.length vec2
     -- cpy vec1 vec2 $ M.length vec2
@@ -118,8 +118,8 @@ heapify vec i = do
         siftDown vec i
 
 -- create a vector from a list, make it mutable and heapify it
-constIter :: (Ord e) => [e] -> IO(MinHeap e)
-constIter li = do
+consIter :: (Ord e) => [e] -> IO(MinHeap e)
+consIter li = do
     -- fromList O(n)
     -- unsafeThaw O(1)
     z <- V.unsafeThaw $ V.fromList li
