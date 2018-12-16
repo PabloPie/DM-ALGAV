@@ -79,3 +79,10 @@ traverseBF heap = tbf [heap]
         tbf [] = []
         tbf xs = map root xs ++ tbf (concatMap subForest xs)
 
+-- test min Heap property
+testHeap :: (Ord a) => Heap a -> Bool
+testHeap (Node _ _ Empty Empty) = True
+testHeap (Node val _ fg Empty) = val < (root fg) && testHeap (fg)
+testHeap (Node val _ Empty fd) = val < (root fd) && testHeap (fd)
+testHeap (Node val _ fg fd) =
+    (val < (root fg)) && (val < (root fd)) && (testHeap fg) && (testHeap fd)

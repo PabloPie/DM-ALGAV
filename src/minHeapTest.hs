@@ -11,6 +11,7 @@ import Data.DoubleWord
 import qualified MinHeapTree as T
 import qualified MinHeapArray as A
 import qualified Data.Heap as D
+import qualified Data.Vector as V
 
 f :: [String] -> [Word128]
 f = map read
@@ -19,6 +20,7 @@ f = map read
 -- if given no arguments or more than 1, it won't show a comprehensible error
 main :: IO()
 main = do
+
     [filename] <- getArgs
 
     let list = []
@@ -26,10 +28,25 @@ main = do
     contents <- hGetContents handle
     let singlewords = words contents
         list = f singlewords
-    -- print list
-    -- hClose handle
--- We have our list of values
 
+    -- testVector list
+    -- testTree list
+    -- putStrLn "---"
+    bench list
+
+testTree :: [Word128] -> IO()
+testTree list = do
+    let a = T.consIter list
+    print $ T.testHeap a
+
+testVector :: [Word128] -> IO()
+testVector list = do
+    a <- A.consIter list
+    z <- V.unsafeFreeze a
+    print $ A.testHeap z 0
+
+bench :: [Word128] -> IO()
+bench list = do
     putStr "Tree minHeap consIter: "
     start <- getTime Monotonic
     evaluate(T.consIter list)

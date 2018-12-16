@@ -14,6 +14,20 @@ printAll vec = do
         print x
         printAll (M.tail vec)
 
+-- test min Heap property
+testHeap :: (Ord a) => V.Vector a -> Int-> Bool
+testHeap heap i
+    | i > div (V.length heap -2) 2 = True
+    | otherwise = do
+        let p = (V.!?) heap i
+        let lc = (V.!?) heap (2*i +1)
+        let rc = (V.!?) heap (2*i +2)
+        if p < lc && (p < rc || rc == Nothing)
+            && testHeap heap (2*i +1) && testHeap heap (2*i +2) then
+            True
+        else
+            False
+
 -- Create minHeap from 2 minHeaps, vectors are not destroyed in the process
 union :: (Ord e) => MinHeap e -> MinHeap e -> IO(MinHeap e)
 union vec1 vec2 = do
