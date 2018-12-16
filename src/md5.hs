@@ -81,12 +81,16 @@ calcFG i b c d
 
 --md5Iter i a b c d m = md5Iter (i+1) d c b (b + (rotate (f + a + (lookupTableSin!idx) + (m!gdx) + (shiftTable!idx2)) fshift)) m
 
+lshift :: Word32 -> Int -> Word32
+lshift val s = rotate val s
+
+
 md5Iter :: Word32 -> Word32 -> Word32 -> Word32 -> Word32 -> Chunk512 -> (Word32, Word32, Word32, Word32)
 md5Iter 64 a b c d m = (a0 + a, b0 + b, c0 + c, d0 + d)
 md5Iter i a b c d m = md5Iter (i+1) a1 b1 c1 d1 m
   where (f, g) = (calcFG i b c d)
-        (idx, idx2, gdx, fshift) = ((word32toInteger i), (word32toInt i), (word32toInt g), (word32toInt f))
-        (a1, b1, c1, d1) = (d, (rotate (f + a + (lookupTableSin!idx) + (m!gdx) + (shiftTable!idx2)) fshift), b, c)
+        (idx, idx2, gdx) = ((word32toInteger i), (word32toInt i), (word32toInt g))
+        (a1, b1, c1, d1) = (d, (b + lshift (f + a + (lookupTableSin!idx) + (m!gdx)) (shiftTable!idx2)), b, c)
 
 
   
