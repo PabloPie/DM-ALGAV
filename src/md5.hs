@@ -46,10 +46,21 @@ pad :: [Word8] -> [Word8]
 pad str
   | diff == 0 = str
   | otherwise = padNChar str diff
-  where diff = 64-((length str) `mod` 64)
+  where diff = ((64-(length str)) `mod` 64)
 
 
-
+--        if 0 ≤ i ≤ 15 then
+--            F := (B and C) or ((not B) and D)
+--            g := i
+--        else if 16 ≤ i ≤ 31 then
+--            F := (D and B) or ((not D) and C)
+--            g := (5×i + 1) mod 16
+--       else if 32 ≤ i ≤ 47 then
+--            F := B xor C xor D
+--            g := (3×i + 5) mod 16
+--        else if 48 ≤ i ≤ 63 then
+--            F := C xor (B or (not D))
+--           g := (7×i) mod 16
 
 calcFG :: Word32 -> Word32 -> Word32 -> Word32 -> (Word32, Word32)
 calcFG i b c d
@@ -62,11 +73,21 @@ calcFG i b c d
 
 -- F + A + K[i] + M[g]
 
+--        F := F + A + K[i] + M[g]
+--        A := D
+--        D := C
+--        C := B
+--        B := B + leftrotate(F, s[i])
+
+--md5Iter i a b c d m = md5Iter (i+1) d c b (b + (rotate (f + a + (lookupTableSin!idx) + (m!gdx) + (shiftTable!idx2)) fshift)) m
+
 md5Iter :: Word32 -> Word32 -> Word32 -> Word32 -> Word32 -> Chunk512 -> (Word32, Word32, Word32, Word32)
 md5Iter 64 a b c d m = (a0 + a, b0 + b, c0 + c, d0 + d)
-md5Iter i a b c d m = md5Iter (i+1) d c b (b + (rotate (f + a + (lookupTableSin!idx) + (m!gdx) + (shiftTable!idx2)) fshift)) m
+md5Iter i a b c d m = md5Iter (i+1) a1 b1 c1 d1 m
   where (f, g) = (calcFG i b c d)
         (idx, idx2, gdx, fshift) = ((word32toInteger i), (word32toInt i), (word32toInt g), (word32toInt f))
+        (a1, b1, c1, d1) = (d, (rotate (f + a + (lookupTableSin!idx) + (m!gdx) + (shiftTable!idx2)) fshift), b, c)
+
 
   
 type Chunk512 = Array Int Word32
@@ -90,18 +111,28 @@ word8toWord32 [] = []
 word8toWord32 (a:(b:(c:(d:tail)))) = ((toWord32 a b c d):(word8toWord32 tail))
 
 
-word32ChunksAux :: [Word32] -> Int -> [Word32] -> ([Word32], [Word32])
-word32ChunksAux [] _ carry = (carry, [])
-word32ChunksAux (a:tail) i carry
-  | i == 0 = (carry, tail)
-  | otherwise = word32ChunksAux tail (i-1) (a:carry)
+-- word32ChunksAux :: [Word32] -> Int -> [Word32] -> ([Word32], [Word32])
+-- word32ChunksAux [] _ carry = (carry, [])
+-- word32ChunksAux (a:tail) i carry
+--  | i == 0 = (carry, tail)
+--  | otherwise = word32ChunksAux tail (i-1) (a:carry)
 
+
+-- word32toChunks :: [Word32] -> [Chunk512]
+-- word32toChunks [] = []
+-- word32toChunks li = (listToArray head):(word32toChunks tail)
+--   where (head, tail) = (word32ChunksAux li 16 [])
+
+
+word32ChunksAux :: [Word32] -> Int -> [Word32] -> [Chunk512] -> [Chunk512]
+word32ChunksAux [] 0 [] carry = carry
+word32ChunksAux [] 0 curList carry = (listToArray curList):carry
+word32ChunksAux li 0 curList carry = (word32ChunksAux li 16 [] ((listToArray curList):carry))
+word32ChunksAux (head:tail) i curList carry = word32ChunksAux tail (i-1) (head:curList) carry
 
 word32toChunks :: [Word32] -> [Chunk512]
-word32toChunks [] = []
-word32toChunks li = (listToArray head):(word32toChunks tail)
-  where (head, tail) = (word32ChunksAux li 16 [])
-                       
+word32toChunks li = word32ChunksAux li 16 [] []
+
 
 -- word32toChunks :: [Word32] -> [Chunk512]
 -- word32toChunks [] = []
