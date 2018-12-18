@@ -7,9 +7,11 @@ import Formatting
 import System.IO
 import Control.Monad
 import Data.DoubleWord
+import Data.Bits
 
 import qualified MinHeapTree as T
 import qualified MinHeapArray as A
+import qualified FileBinomiale as F
 import qualified Data.Heap as D
 import qualified Data.Vector as V
 
@@ -29,31 +31,32 @@ main = do
     let singlewords = words contents
         list = f singlewords
 
-    -- testVector list
-    -- testTree list
-    -- putStrLn "---"
-    bench list
+    -- testHeap list
+    benchUnion list
+    testQueue list
 
-testTree :: [Word128] -> IO()
-testTree list = do
+testHeap :: [Word128] -> IO()
+testHeap list = do
+    putStr ("Tree: ")
     let a = T.consIter list
     print $ T.testHeap a
-
-testVector :: [Word128] -> IO()
-testVector list = do
+    putStr ("Array: ")
     a <- A.consIter list
     z <- V.unsafeFreeze a
     print $ A.testHeap z 0
 
-bench :: [Word128] -> IO()
-bench list = do
+testQueue :: [Word128] -> IO()
+testQueue list = do
+    let a = F.consIter list
+    print $ popCount (length list) == length a
+
+benchCons :: [Word128] -> IO()
+benchCons list = do
     putStr "Tree minHeap consIter: "
     start <- getTime Monotonic
     evaluate(T.consIter list)
     end <- getTime Monotonic
     fprint (timeSpecs % "\n") start end
-    let a = T.consIter list
-    -- print $ T.traverseBF a
 
     putStr "Array minHeap consIter: "
     start <- getTime Monotonic
@@ -66,10 +69,15 @@ bench list = do
     evaluate(D.fromList list :: D.MinHeap Word128)
     end <- getTime Monotonic
     fprint (timeSpecs % "\n") start end
-    -- A.printAll a
 
-    putStrLn "---"
+    putStr "Binomial Heap consIter: "
+    start <- getTime Monotonic
+    evaluate(F.consIter list)
+    end <- getTime Monotonic
+    fprint (timeSpecs % "\n") start end
 
+benchUnion :: [Word128] -> IO() 
+benchUnion list = do
     putStr "Tree minHeap union: "
     let (l1,l2) = splitAt (length list `div` 2) list
     let a = T.consIter l1
@@ -79,7 +87,6 @@ bench list = do
     end <- getTime Monotonic
     fprint (timeSpecs % "\n") start end
     let c = T.union a b
-    -- print $ T.traverseBF c
 
     putStr "Array minHeap union: "
     a <- A.consIter l1
@@ -88,18 +95,23 @@ bench list = do
     c <- A.union a b
     end <- getTime Monotonic
     fprint (timeSpecs % "\n") start end
-    -- A.printAll c
 
-    putStrLn "---"
+    putStr "Binomial Heap union: "
+    let a = F.consIter l1
+    let b = F.consIter l2
+    start <- getTime Monotonic
+    evaluate(F.union a b)
+    end <- getTime Monotonic
+    fprint (timeSpecs % "\n") start end 
 
+benchAdd :: [Word128] -> IO()
+benchAdd list = do
     putStr "Tree minHeap add: "
     let a = T.consIter list
     start <- getTime Monotonic
     evaluate(T.add a 1)
     end <- getTime Monotonic
     fprint (timeSpecs % "\n") start end
-    let c = T.add a 1
-    -- print $ T.traverseBF c
 
     putStr "Array minHeap add: "
     a <- A.consIter list
@@ -107,4 +119,3 @@ bench list = do
     A.add a 1
     end <- getTime Monotonic
     fprint (timeSpecs % "\n") start end
-    -- A.printAll a

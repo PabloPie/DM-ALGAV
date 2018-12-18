@@ -2,13 +2,13 @@ module MinHeapTree where
 
 
 -- Leftist tree
-data BinaryTree a = Empty | Node a Int (BinaryTree a) (BinaryTree a) deriving (Read, Show, Eq)
+data BinaryTree a = Empty | Node a Int (BinaryTree a) (BinaryTree a) deriving (Read, Eq)
 
 -- Heap are defined as binary trees
 type Heap = BinaryTree
 
--- instance (Show a) => Show (BinaryTree a) where
---   show heap = traverseBF heap
+instance (Show a) => Show (BinaryTree a) where
+  show heap = show $ traverseBF heap
 
 singleton :: a -> Heap a
 singleton x =  Node x 1 Empty Empty
