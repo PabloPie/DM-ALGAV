@@ -18,15 +18,13 @@ printAll vec = do
 testHeap :: (Ord a) => V.Vector a -> Int-> Bool
 testHeap heap i
     | i > div (V.length heap -2) 2 = True
-    | otherwise = do
-        let p = (V.!?) heap i
-        let lc = (V.!?) heap (2*i +1)
-        let rc = (V.!?) heap (2*i +2)
-        if p < lc && (p < rc || rc == Nothing)
-            && testHeap heap (2*i +1) && testHeap heap (2*i +2) then
-            True
-        else
-            False
+    | otherwise =
+        p < lc && (p < rc || rc == Nothing)
+            && testHeap heap (2*i +1) && testHeap heap (2*i +2)
+        where
+        lc = (V.!?) heap (2*i +1)
+        rc = (V.!?) heap (2*i +2)
+        p = (V.!?) heap i
 
 -- Create minHeap from 2 minHeaps, vectors are not destroyed in the process
 union :: (Ord e) => MinHeap e -> MinHeap e -> IO(MinHeap e)
