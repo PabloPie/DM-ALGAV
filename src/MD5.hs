@@ -116,7 +116,7 @@ md5Iter i a b c d m strl = md5Iter (i+1) a1 b1 c1 d1 m (str1:strl)
   where (f, g) = (calcFG i b c d)
         (idx, idx2, gdx) = ((word32toInt i), (word32toInt i), (word32toInt g))
         (a1, b1, c1, d1) = (d, (b + lshift (f + a + (lookupTableSin!idx) + (m!gdx)) (shiftTable!idx2)), b, c)
-        str1 = (printf "rotateLeft(%08x + %08x + %08x + %08x, %d) \n" a f (lookupTableSin!idx) (m!gdx) (shiftTable!idx))
+        str1 = (printf "rotateLeft(%08x + %08x + %08x + %08x (%d), %08x - %08x) \n" a f (lookupTableSin!idx) (m!gdx) gdx (m!0) (shiftTable!idx))
 
 
   
@@ -126,7 +126,7 @@ type Chunk512 = Array Int Word32
 md5Aux :: [Chunk512] -> Word32 -> Word32 -> Word32 -> Word32 -> [String] -> (Word32, Word32, Word32, Word32, [String])
 md5Aux [] a b c d strl = (a, b, c, d, strl)
 md5Aux (head:tail) a b c d strl  = md5Aux tail a1 b1 c1 d1 strl1
-  where (a1, b1, c1, d1, strl1) = md5Iter 0 a b c d head strl
+  where (a1, b1, c1, d1, strl1) = md5Iter 0 a b c d head ("      ":strl)
 
 
 toWord32 :: Word8 -> Word8 -> Word8 -> Word8 -> Word32
@@ -157,7 +157,7 @@ word8toWord32 (a:(b:(c:(d:tail)))) = ((toWord32 a b c d):(word8toWord32 tail))
 word32ChunksAux :: [Word32] -> Int -> [Word32] -> [Chunk512] -> [Chunk512]
 word32ChunksAux [] 0 [] carry = carry
 word32ChunksAux [] 0 curList carry = (listToArray (reverseList curList)):carry
-word32ChunksAux li 0 curList carry = (word32ChunksAux li 16 [] ((listToArray curList):carry))
+word32ChunksAux li 0 curList carry = (word32ChunksAux li 16 [] ((listToArray (reverseList curList)):carry))
 word32ChunksAux (head:tail) i curList carry = word32ChunksAux tail (i-1) (head:curList) carry
 
 word32toChunks :: [Word32] -> [Chunk512]
@@ -191,7 +191,7 @@ invertBytes w = toWord32 a b c d
           
 
 
-md5 :: String -> Key128
+md5 :: String -> (Key128)
 md5 str = word32to128 (invertBytes h1, invertBytes h2, invertBytes h3, invertBytes h4)
   where chunks = slice32 (prepare (bsToWord8 (strToBS str)))
         (h1, h2, h3, h4, strl) = md5Aux chunks a0 b0 c0 d0 []
