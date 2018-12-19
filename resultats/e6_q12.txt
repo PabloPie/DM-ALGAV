@@ -1,0 +1,43 @@
+
+
+|----------------------+-----------------|
+| Nom                  | Mots differents |
+|----------------------+-----------------|
+| 1henryiv.txt         |            3723 |
+| 1henryvi.txt         |            3725 |
+| 2henryiv.txt         |            3963 |
+| 2henryvi.txt         |            3935 |
+| 3henryvi.txt         |            3448 |
+| allswell.txt         |            3388 |
+| asyoulikeit.txt      |            3170 |
+| cleopatra.txt        |            3782 |
+| comedy_errors.txt    |            2438 |
+| coriolanus.txt       |            3883 |
+| cymbeline.txt        |            4057 |
+| hamlet.txt           |            4554 |
+| henryviii.txt        |            3515 |
+| henryv.txt           |            4393 |
+| john.txt             |            3437 |
+| julius_caesar.txt    |            2793 |
+| lear.txt             |            4007 |
+| lll.txt              |            3637 |
+| macbeth.txt          |            3204 |
+| measure.txt          |            3229 |
+| merchant.txt         |            3160 |
+| merry_wives.txt      |            3188 |
+| midsummer.txt        |            2914 |
+| much_ado.txt         |            2907 |
+| othello.txt          |            3665 |
+| pericles.txt         |            3144 |
+| richardiii.txt       |            3896 |
+| richardii.txt        |            3513 |
+| romeo_juliet.txt     |            3545 |
+| taming_shrew.txt     |            3149 |
+| tempest.txt          |            3084 |
+| timon.txt            |            3187 |
+| titus.txt            |            3306 |
+| troilus_cressida.txt |            4119 |
+| twelfth_night.txt    |            3030 |
+| two_gentlemen.txt    |            2638 |
+| winters_tale.txt     |            3714 |
+| All                  |           23086 |
