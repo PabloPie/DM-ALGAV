@@ -5,6 +5,8 @@ import Text.Printf
 
 import System.IO
 
+import qualified Data.Vector.Mutable as DVM
+
 import MD5
 import Key128
 import MinHeapArray as MHA
@@ -14,17 +16,25 @@ import MinHeapArray as MHA
 main :: IO()
 main = do
 
-    --[filename] <- getArgs
+    -- [filename] <- getArgs
 
     let list = []
     handle <- openFile "../data/Shakespeare/lear.txt" ReadMode
     contents <- hGetContents handle
     let singlewords = words contents
 
+    -- Step 1: Hasher
+    -- Step 2: Inserer hash dans ABR si existe pas
+    -- Step 3: Inserer mot non hashe dans la file de priorite si il n'existe pas dans l'ABR
+    
     let hashes = md5All singlewords
-    let tree = (MHA.consIter hashes)
+    heap <- (MHA.consIter hashes)
 
-    putStr "end"
+    print "Mots: "
+    print (length singlewords)
+    
+    print "#Lear: "
+    print (DVM.length heap)
     
 
 md5AllAux :: [String] -> [Key128] -> [Key128]
