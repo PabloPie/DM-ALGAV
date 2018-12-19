@@ -19,7 +19,7 @@ main = do
     -- [filename] <- getArgs
 
     let list = []
-    handle <- openFile "../data/Shakespeare/Shakespeare.txt" ReadMode
+    handle <- openFile "../data/Shakespeare/lear.txt" ReadMode
     contents <- hGetContents handle
     let singlewords = words contents
 
