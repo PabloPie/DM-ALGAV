@@ -11,16 +11,12 @@ type FBinomiale a = [TBinomial a]
 instance Show a => Show (TBinomial a) where
   show bt =  show $ traverseBF bt
 
-subForest :: TBinomial a -> [TBinomial a]
-subForest (Node _ _ []) = []
-subForest (Node _ _ li) = li
-
 traverseBF :: TBinomial a -> [a]
 traverseBF TEmpty = error "Empty Binomial Tree!"
 traverseBF bt = tbf [bt]
   where
     tbf [] = []
-    tbf xs = map racine xs ++ tbf (concatMap subForest xs)
+    tbf xs = map racine xs ++ tbf (concatMap decapiter xs)
 
 estTVide :: TBinomial a -> Bool
 estTVide TEmpty = True
