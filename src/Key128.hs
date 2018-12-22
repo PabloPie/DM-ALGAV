@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeSynonymInstances, FlexibleInstances, OverlappingInstances #-}
+
 module Key128
 where
 
