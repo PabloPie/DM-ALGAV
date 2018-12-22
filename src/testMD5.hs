@@ -16,20 +16,15 @@ import ABR as ABR
 main :: IO()
 main = do
 
-    -- [filename] <- getArgs
+    [filename] <- getArgs
 
-    let list = []
-    handle <- openFile "../data/Shakespeare/lear.txt" ReadMode
+    handle <- openFile filename ReadMode
     contents <- hGetContents handle
     let singlewords = words contents
 
-    -- Step 1: Hasher
-    -- Step 2: Inserer hash dans ABR si existe pas
-    -- Step 3: Inserer mot non hashe dans la file de priorite si il n'existe pas dans l'ABR
-
     let (abr, list) = insertAllHashes singlewords
     
-    print "#Lear: "
+    -- print "#Lear: "
     print (abr)
 
     print "Liste mots differents"
