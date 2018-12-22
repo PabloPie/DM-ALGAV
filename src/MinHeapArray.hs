@@ -26,13 +26,13 @@ testHeap heap i
         rc = (V.!?) heap (2*i +2)
         p = (V.!?) heap i
 
--- Create minHeap from 2 minHeaps, vectors are not destroyed in the process
+-- Create minHeap from 2 minHeaps, vectors are destroyed in the process
 union :: (Ord e) => MinHeap e -> MinHeap e -> IO(MinHeap e)
 union vec1 vec2 = do
-    -- O(n)
-    z <- V.freeze vec1
-    -- O(n)
-    zz <- V.freeze vec2
+    -- O(1)
+    z <- V.unsafeFreeze vec1
+    -- O(1)
+    zz <- V.unsafeFreeze vec2
     -- O(n+m)
     let v = z V.++ zz
     -- O(n+m)
@@ -45,26 +45,22 @@ union vec1 vec2 = do
 -- Add element to vector
 add :: (Ord e) => (MinHeap e) -> e -> IO()
 add vec ele = do
-    M.grow vec 1
+    M.unsafeGrow vec 1
     M.write vec (M.length vec -1) ele
     siftUp vec $ M.length vec -1
 
 
 -- sift the value until the parent is lower or we reach the root
 siftUp :: (Ord e) => (MinHeap e) -> Int -> IO()
-siftUp vec i = do 
-    if i == 0 then
-        return ()
-    else do
-        let parentIndex = div (i-1) 2
-        parent <- M.read vec parentIndex
-        node <- M.read vec i
-        if node < parent then do
-            M.swap vec i parentIndex
-            siftUp vec parentIndex
-        else
-            return ()
-
+siftUp vec 0 = return ()
+siftUp vec i = do
+    let parentIndex = div (i-1) 2
+    parent <- M.read vec parentIndex
+    node <- M.read vec i
+    if node < parent then do
+        M.swap vec i parentIndex
+        siftUp vec parentIndex
+    else return ()
 
 -- be careful with taking the modified input instead of the output
 supprMin :: (Ord e) => (MinHeap e) -> IO(MinHeap e)
