@@ -2,13 +2,13 @@ module MinHeapTree where
 
 
 -- Leftist tree
-data BinaryTree a = Empty | Node a Int (BinaryTree a) (BinaryTree a) deriving (Read, Eq)
+data LeftistTree a = Empty | Node a Int (LeftistTree a) (LeftistTree a) deriving (Read, Show, Eq)
 
 -- Heap are defined as binary trees
-type Heap = BinaryTree
+type Heap = LeftistTree
 
-instance (Show a) => Show (BinaryTree a) where
-  show heap = show $ traverseBF heap
+-- instance (Show a) => Show (LeftistTree a) where
+  -- show heap = show $ traverseBF heap
 
 singleton :: a -> Heap a
 singleton x =  Node x 1 Empty Empty
@@ -22,10 +22,12 @@ rank :: Heap a -> Int
 rank Empty = 0
 rank (Node _ r _ _) = r
 
+-- O(log n)
 supprMin :: (Ord a) => Heap a -> Heap a
 supprMin Empty = Empty
 supprMin (Node _ _ fd fg) = union fg fd
 
+-- O(log n)
 add :: (Ord a) => Heap a -> a -> Heap a
 add Empty elt = singleton elt
 add h1 elt = union h1 $ singleton elt
@@ -38,6 +40,7 @@ consIter :: (Ord a) => [a] -> Heap a
 consIter [] = Empty
 consIter li = heapConsIterAux Empty li
 
+-- O(log n)
 union :: (Ord a) => Heap a -> Heap a -> Heap a
 union Empty h2 = h2
 union h1 Empty = h1
