@@ -54,19 +54,6 @@ union h1@(Node rootH1 r1 fg1 fd1) h2@(Node rootH2 r2 fg2 fd2)
             merged = union fd1 h2
             rrank = rank merged
 
--- Okasaki implementation
-unionAlt :: (Ord a) => Heap a -> Heap a -> Heap a
-unionAlt Empty h2 = h2
-unionAlt h1 Empty = h1
-unionAlt h1@(Node rootH1 r1 fg1 fd1) h2@(Node rootH2 r2 fg2 fd2)
-    | rootH1 <= rootH2 = makeT rootH1 fg1 (unionAlt fd1 h2)
-    | otherwise = makeT rootH2 fg2 (unionAlt h1 fd2)
-
-makeT :: a -> Heap a -> Heap a -> Heap a
-makeT val h1 h2
-    | rank h1 >= rank h2 = Node val (rank h2 +1) h1 h2
-    | otherwise = Node val (rank h1 +1) h2 h1  
-
 -- http://matthewmanela.com/blog/breadth-first-tree-traversal-in-haskell/
 -- given a Heap, returns a list with its children
 subForest :: Heap a -> [Heap a]
