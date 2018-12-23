@@ -46,6 +46,7 @@ main = do
 	a@[a1,b1,c1,d1,e1,f1,g1,h1,i1,j1,k1,l1,m1,n1] <- createArrays
 	b@[a2,b2,c2,d2,e2,f2,g2,h2,i2,j2,k2,l2,m2,n2] <- createTrees
 	c@[a3,b3,c3,d3,e3,f3,g3,h3,i3,j3,k3,l3,m3,n3] <- createQueues
+	a `seq` b `seq` c `seq` return()
 	defaultMain [
 	    env createLists $ \ ~[a,b,c,d,e,f,g] -> bgroup "consIter" [
 	  			bgroup "tree" [
@@ -105,35 +106,35 @@ main = do
 	               , bench "50000" $ whnfIO $ A.union m1 n1
 	            ]
 	    	]
-	    ,bgroup "add" [
-	  			bgroup "tree" [
-	  			     bench "100"  $ whnf addT (a2)
-	               , bench "500"  $ whnf
-	               , bench "1000"  $ whnf
-	               , bench "5000" $ whnf
-	               , bench "10000" $ whnf
-	               , bench "20000" $ whnf
-	               , bench "50000" $ whnf
-	               ]
-	            ,bgroup "fb" [
-	  			     bench "100"  $ whnf unionFB (a3, b3) -- no evaluado
-	               , bench "500"  $ whnf unionFB (c3, d3)
-	               , bench "1000"  $ whnf unionFB (e3, f3)
-	               , bench "5000" $ whnf unionFB (g3, h3)
-	               , bench "10000" $ whnf unionFB (i3, j3)
-	               , bench "20000" $ whnf unionFB (k3, k3)
-	               , bench "50000" $ whnf unionFB (m3, n3)
-	            ]
-	            ,bgroup "array" [
-	  			     bench "100"  $ whnfIO $ A.union a1 b1
-	               , bench "500"  $ whnfIO $  A.union c1 d1
-	               , bench "1000"  $ whnfIO $ A.union e1 f1
-	               , bench "5000" $ whnfIO $ A.union g1 h1
-	               , bench "10000" $ whnfIO $ A.union i1 j1
-	               , bench "20000" $ whnfIO $ A.union k1 l1
-	               , bench "50000" $ whnfIO $ A.union m1 n1
-	            ]
-	    	]
+	    -- ,bgroup "add" [
+	  		-- 	bgroup "tree" [
+	  		-- 	     bench "100"  $ whnf addT (a2)
+	    --            , bench "500"  $ whnf
+	    --            , bench "1000"  $ whnf
+	    --            , bench "5000" $ whnf
+	    --            , bench "10000" $ whnf
+	    --            , bench "20000" $ whnf
+	    --            , bench "50000" $ whnf
+	    --            ]
+	    --         ,bgroup "fb" [
+	  		-- 	     bench "100"  $ whnf unionFB (a3, b3) -- no evaluado
+	    --            , bench "500"  $ whnf unionFB (c3, d3)
+	    --            , bench "1000"  $ whnf unionFB (e3, f3)
+	    --            , bench "5000" $ whnf unionFB (g3, h3)
+	    --            , bench "10000" $ whnf unionFB (i3, j3)
+	    --            , bench "20000" $ whnf unionFB (k3, k3)
+	    --            , bench "50000" $ whnf unionFB (m3, n3)
+	    --         ]
+	    --         ,bgroup "array" [
+	  		-- 	     bench "100"  $ whnfIO $ A.union a1 b1
+	    --            , bench "500"  $ whnfIO $  A.union c1 d1
+	    --            , bench "1000"  $ whnfIO $ A.union e1 f1
+	    --            , bench "5000" $ whnfIO $ A.union g1 h1
+	    --            , bench "10000" $ whnfIO $ A.union i1 j1
+	    --            , bench "20000" $ whnfIO $ A.union k1 l1
+	    --            , bench "50000" $ whnfIO $ A.union m1 n1
+	    --         ]
+	    -- 	]
 	    -- ,bgroup "deleteMin" [
 	  		-- 	bgroup "tree" [
 	  		-- 	     bench "100"  $ whnf  unionT (a2, b2)
